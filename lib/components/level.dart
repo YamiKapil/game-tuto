@@ -1,11 +1,13 @@
 import 'dart:async';
 
 import 'package:flame/components.dart';
+import 'package:flame_game_tuto/components/background_tile.dart';
 import 'package:flame_game_tuto/components/collision_block.dart';
 import 'package:flame_game_tuto/components/player.dart';
+import 'package:flame_game_tuto/pixel_adventure.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 
-class Level extends World {
+class Level extends World with HasGameRef<PixelAdventure> {
   final String levelName;
   final Player player;
   Level({
@@ -26,6 +28,39 @@ class Level extends World {
     /// adding level to the Level
     add(level);
 
+    _scrollingBackground();
+    _spawningObjects();
+    _addCollisions();
+    // add(Player(character: 'Ninja Frog'));
+    return super.onLoad();
+  }
+
+  /// adding background on the level
+  void _scrollingBackground() {
+    final backgroundLayer = level.tileMap.getLayer('Background');
+    const tileSize = 64;
+
+    /// need to know how many tiles is needed..
+    final numTilesY = (game.size.y / tileSize).floor();
+    final numTilesX = (game.size.x / tileSize).floor();
+    if (backgroundLayer != null) {
+      final backgroundColor =
+          backgroundLayer.properties.getValue('BackgroundColor');
+
+      /// looping to create background tile
+      for (double y = 0; y < game.size.y / numTilesY; y++) {
+        for (double x = 0; x < numTilesX; x++) {
+          final backgroungTile = BackgroundTile(
+            color: backgroundColor ?? 'Gray',
+            position: Vector2(x * tileSize, y * tileSize - tileSize),
+          );
+          add(backgroungTile);
+        }
+      }
+    }
+  }
+
+  void _spawningObjects() {
     /// spawn point
     final spawnPointsLayer = level.tileMap.getLayer<ObjectGroup>('SpawnPoint');
 
@@ -44,8 +79,9 @@ class Level extends World {
         }
       }
     }
-    // add(Player(character: 'Ninja Frog'));
+  }
 
+  void _addCollisions() {
     /// adding collision
     final collisionsLayer = level.tileMap.getLayer<ObjectGroup>('Collisions');
 
@@ -72,6 +108,5 @@ class Level extends World {
       }
     }
     player.collisionBlocks = collisionBlocks;
-    return super.onLoad();
   }
 }
