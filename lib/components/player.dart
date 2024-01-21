@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame_game_tuto/components/collision_block.dart';
+import 'package:flame_game_tuto/components/fruit.dart';
 import 'package:flame_game_tuto/components/player_hitbox.dart';
 import 'package:flame_game_tuto/components/utils.dart';
 import 'package:flame_game_tuto/pixel_adventure.dart';
@@ -23,7 +24,7 @@ enum PlayerState {
 // }
 
 class Player extends SpriteAnimationGroupComponent
-    with HasGameRef<PixelAdventure>, KeyboardHandler {
+    with HasGameRef<PixelAdventure>, KeyboardHandler, CollisionCallbacks {
   final String character;
   Player({
     this.character = 'Ninja Frog',
@@ -39,7 +40,7 @@ class Player extends SpriteAnimationGroupComponent
 
   /// setting default player direction
   // PlayerDirection playerDirection = PlayerDirection.none;
-  double moveSpeed = 100;
+  double moveSpeed = 150;
   Vector2 velocity = Vector2.zero();
   double horizontalMovement = 0;
 
@@ -47,7 +48,8 @@ class Player extends SpriteAnimationGroupComponent
   List<CollisionBlock> collisionBlocks = [];
 
   final double _gravity = 9.8;
-  final double _jumpForce = 260;
+  // final double _jumpForce = 260;
+  final double _jumpForce = 180;
 
   /// when we are falling, the more we fall the faster we fall
   final double _terminalVelocity = 300;
@@ -55,7 +57,7 @@ class Player extends SpriteAnimationGroupComponent
   bool hasJumped = false;
 
   /// player hitbox
-  PlayerHitbox hitbox = PlayerHitbox(
+  CustomHitbox hitbox = CustomHitbox(
     offsetX: 10,
     offsetY: 4,
     width: 14,
@@ -118,6 +120,15 @@ class Player extends SpriteAnimationGroupComponent
     hasJumped = [LogicalKeyboardKey.arrowUp, LogicalKeyboardKey.keyW]
         .any(keysPressed.contains);
     return super.onKeyEvent(event, keysPressed);
+  }
+
+  @override
+  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+    if (other is Fruit) {
+      /// coliding...
+      other.collidedWithPlayer();
+    }
+    super.onCollision(intersectionPoints, other);
   }
 
   void _loadAllAnimations() async {

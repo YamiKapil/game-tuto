@@ -9,7 +9,7 @@ class BackgroundTile extends SpriteComponent with HasGameRef<PixelAdventure> {
     position,
     this.color = 'Gray',
   }) : super(position: position);
-  final double scrollSpeed = 0.4;
+  final double scrollSpeed = 2;
 
   @override
   FutureOr<void> onLoad() {
