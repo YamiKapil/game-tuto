@@ -69,6 +69,8 @@ flutter:
     - assets/images/HUD/
     - assets/images/Background/
     - assets/images/Items/Fruits/
+    - assets/images/Traps/Saw/
+    - assets/images/Main Characters/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

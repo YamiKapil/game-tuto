@@ -5,6 +5,7 @@ import 'package:flame/components.dart';
 import 'package:flame_game_tuto/components/collision_block.dart';
 import 'package:flame_game_tuto/components/fruit.dart';
 import 'package:flame_game_tuto/components/player_hitbox.dart';
+import 'package:flame_game_tuto/components/saw.dart';
 import 'package:flame_game_tuto/components/utils.dart';
 import 'package:flame_game_tuto/pixel_adventure.dart';
 import 'package:flutter/services.dart';
@@ -15,6 +16,8 @@ enum PlayerState {
   running,
   jumping,
   falling,
+  hit,
+  appearing,
 }
 
 // enum PlayerDirection {
@@ -37,6 +40,8 @@ class Player extends SpriteAnimationGroupComponent
   late final SpriteAnimation runningAnimation;
   late final SpriteAnimation jumpingAnimation;
   late final SpriteAnimation fallingAnimation;
+  late final SpriteAnimation hitAnimation;
+  late final SpriteAnimation appearingAnimation;
 
   /// setting default player direction
   // PlayerDirection playerDirection = PlayerDirection.none;
@@ -56,6 +61,10 @@ class Player extends SpriteAnimationGroupComponent
   bool isOnGround = false;
   bool hasJumped = false;
 
+  /// reference to player starting position
+  Vector2 startingPosition = Vector2.zero();
+  bool gotHit = false;
+
   /// player hitbox
   CustomHitbox hitbox = CustomHitbox(
     offsetX: 10,
@@ -70,6 +79,9 @@ class Player extends SpriteAnimationGroupComponent
   @override
   FutureOr<void> onLoad() {
     _loadAllAnimations();
+
+    /// getting player initial position and setting it..
+    startingPosition = Vector2(position.x, position.y);
     // debugMode = true;
     add(RectangleHitbox(
       position: Vector2(hitbox.offsetX, hitbox.offsetY),
@@ -80,13 +92,15 @@ class Player extends SpriteAnimationGroupComponent
 
   @override
   void update(double dt) {
-    _updatePlayerState();
-    _updatePlayerMoment(dt);
-    _checkHorizontalCollisions();
+    if (!gotHit) {
+      _updatePlayerState();
+      _updatePlayerMoment(dt);
+      _checkHorizontalCollisions();
 
-    /// do gravity always after horizontal collision
-    _applyGravity(dt);
-    _checkVerticalCollision();
+      /// do gravity always after horizontal collision
+      _applyGravity(dt);
+      _checkVerticalCollision();
+    }
     super.update(dt);
   }
 
@@ -128,6 +142,9 @@ class Player extends SpriteAnimationGroupComponent
       /// coliding...
       other.collidedWithPlayer();
     }
+    if (other is Saw) {
+      _respawn();
+    }
     super.onCollision(intersectionPoints, other);
   }
 
@@ -136,6 +153,8 @@ class Player extends SpriteAnimationGroupComponent
     runningAnimation = _spriteAnimation('Run', 12);
     jumpingAnimation = _spriteAnimation('Jump', 1);
     fallingAnimation = _spriteAnimation('Fall', 1);
+    hitAnimation = _spriteAnimation('Hit', 7);
+    appearingAnimation = _specialSpriteAnimation('Appearing', 7);
 
     /// setting animation for different player states
     /// list of animations
@@ -144,6 +163,8 @@ class Player extends SpriteAnimationGroupComponent
       PlayerState.running: runningAnimation,
       PlayerState.jumping: jumpingAnimation,
       PlayerState.falling: fallingAnimation,
+      PlayerState.hit: hitAnimation,
+      PlayerState.appearing: appearingAnimation,
     };
 
     /// setting current state(animation)
@@ -157,6 +178,18 @@ class Player extends SpriteAnimationGroupComponent
         amount: amount,
         stepTime: stepTime,
         textureSize: Vector2.all(32),
+      ),
+    );
+  }
+
+  /// appearing and disappearing.. animation
+  SpriteAnimation _specialSpriteAnimation(String state, int amount) {
+    return SpriteAnimation.fromFrameData(
+      game.images.fromCache('Main Characters/$state (96x96).png'),
+      SpriteAnimationData.sequenced(
+        amount: amount,
+        stepTime: stepTime,
+        textureSize: Vector2.all(96),
       ),
     );
   }
@@ -290,5 +323,27 @@ class Player extends SpriteAnimationGroupComponent
     position.y += velocity.y * dt;
     hasJumped = false;
     isOnGround = false;
+  }
+
+  void _respawn() {
+    /// duration is 50 times amount of frame which is 7
+    const hitDuration = Duration(milliseconds: 350);
+    const appearingDuration = Duration(milliseconds: 350);
+    const canMoveDuration = Duration(milliseconds: 400);
+    gotHit = true;
+    current = PlayerState.hit;
+    Future.delayed(hitDuration, () {
+      scale.x = 1;
+      position = startingPosition - Vector2.all(32);
+      current = PlayerState.appearing;
+      Future.delayed(appearingDuration, () {
+        velocity = Vector2.zero();
+        position = startingPosition;
+        _updatePlayerState();
+        Future.delayed(canMoveDuration, () {
+          gotHit = false;
+        });
+      });
+    });
   }
 }
