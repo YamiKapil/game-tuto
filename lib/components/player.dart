@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:flame_game_tuto/components/checkpoint.dart';
 import 'package:flame_game_tuto/components/collision_block.dart';
 import 'package:flame_game_tuto/components/fruit.dart';
 import 'package:flame_game_tuto/components/player_hitbox.dart';
@@ -18,6 +19,7 @@ enum PlayerState {
   falling,
   hit,
   appearing,
+  disappearing,
 }
 
 // enum PlayerDirection {
@@ -42,6 +44,7 @@ class Player extends SpriteAnimationGroupComponent
   late final SpriteAnimation fallingAnimation;
   late final SpriteAnimation hitAnimation;
   late final SpriteAnimation appearingAnimation;
+  late final SpriteAnimation disappearingAnimation;
 
   /// setting default player direction
   // PlayerDirection playerDirection = PlayerDirection.none;
@@ -73,6 +76,9 @@ class Player extends SpriteAnimationGroupComponent
     height: 28,
   );
 
+  /// check if the player have reached checkpoint
+  bool reachedCheckpoint = false;
+
   /// checking player direction face
   // bool isFacingRight = true;
 
@@ -92,7 +98,7 @@ class Player extends SpriteAnimationGroupComponent
 
   @override
   void update(double dt) {
-    if (!gotHit) {
+    if (!gotHit && !reachedCheckpoint) {
       _updatePlayerState();
       _updatePlayerMoment(dt);
       _checkHorizontalCollisions();
@@ -138,12 +144,18 @@ class Player extends SpriteAnimationGroupComponent
 
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
-    if (other is Fruit) {
-      /// coliding...
-      other.collidedWithPlayer();
-    }
-    if (other is Saw) {
-      _respawn();
+    if (!reachedCheckpoint) {
+      if (other is Fruit) {
+        /// coliding...
+        other.collidedWithPlayer();
+      }
+      if (other is Saw) {
+        /// respawn on death
+        _respawn();
+      }
+      if (other is CheckPoint) {
+        _reachedCheckpoint();
+      }
     }
     super.onCollision(intersectionPoints, other);
   }
@@ -155,6 +167,7 @@ class Player extends SpriteAnimationGroupComponent
     fallingAnimation = _spriteAnimation('Fall', 1);
     hitAnimation = _spriteAnimation('Hit', 7);
     appearingAnimation = _specialSpriteAnimation('Appearing', 7);
+    disappearingAnimation = _specialSpriteAnimation('Desappearing', 7);
 
     /// setting animation for different player states
     /// list of animations
@@ -165,6 +178,7 @@ class Player extends SpriteAnimationGroupComponent
       PlayerState.falling: fallingAnimation,
       PlayerState.hit: hitAnimation,
       PlayerState.appearing: appearingAnimation,
+      PlayerState.disappearing: disappearingAnimation,
     };
 
     /// setting current state(animation)
@@ -343,6 +357,30 @@ class Player extends SpriteAnimationGroupComponent
         Future.delayed(canMoveDuration, () {
           gotHit = false;
         });
+      });
+    });
+  }
+
+  void _reachedCheckpoint() {
+    reachedCheckpoint = true;
+    if (scale.x > 0) {
+      position = position - Vector2.all(32);
+    } else if (scale.x < 0) {
+      position = position + Vector2(32, -32);
+    }
+    current = PlayerState.disappearing;
+    const reachedCheckpointDuration = Duration(milliseconds: 350);
+    Future.delayed(reachedCheckpointDuration, () {
+      reachedCheckpoint = false;
+
+      /// removing player from the screen..
+      /// for now just placing player way off the screen..
+      position = Vector2.all(-640);
+
+      /// moving to next level..
+      const waitToChangeDuration = Duration(seconds: 3);
+      Future.delayed(waitToChangeDuration, () {
+        game.loadNextLevel();
       });
     });
   }
