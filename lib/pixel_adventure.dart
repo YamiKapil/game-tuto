@@ -4,12 +4,17 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
+import 'package:flame_game_tuto/components/jump_button.dart';
 import 'package:flame_game_tuto/components/player.dart';
 import 'package:flame_game_tuto/components/level.dart';
 import 'package:flutter/material.dart';
 
 class PixelAdventure extends FlameGame
-    with HasKeyboardHandlerComponents, DragCallbacks, HasCollisionDetection {
+    with
+        HasKeyboardHandlerComponents,
+        DragCallbacks,
+        HasCollisionDetection,
+        TapCallbacks {
   /// overriding the background color
   @override
   Color backgroundColor() => const Color(0xff211F30);
@@ -20,7 +25,7 @@ class PixelAdventure extends FlameGame
 
   /// creating joystick
   late JoystickComponent joystick;
-  bool showJoystick = false;
+  bool showControlls = false;
   List<String> levelNames = [
     'Level-01',
     'Level-01',
@@ -55,8 +60,9 @@ class PixelAdventure extends FlameGame
     /// making level dynamic...
     _loadLevel();
 
-    if (showJoystick) {
+    if (showControlls) {
       addJoystick();
+      add(JumpButton());
     }
 
     return super.onLoad();
@@ -64,13 +70,14 @@ class PixelAdventure extends FlameGame
 
   @override
   void update(double dt) {
-    if (showJoystick) {
+    if (showControlls) {
       updateJoystick();
     }
     super.update(dt);
   }
 
   void addJoystick() {
+    priority = 10;
     joystick = JoystickComponent(
       knob: SpriteComponent(
         sprite: Sprite(

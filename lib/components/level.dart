@@ -41,25 +41,30 @@ class Level extends World with HasGameRef<PixelAdventure> {
   /// adding background on the level
   void _scrollingBackground() {
     final backgroundLayer = level.tileMap.getLayer('Background');
-    const tileSize = 64;
+    // const tileSize = 64;
 
-    /// need to know how many tiles is needed..
-    final numTilesY = (game.size.y / tileSize).floor();
-    final numTilesX = (game.size.x / tileSize).floor();
+    // /// need to know how many tiles is needed..
+    // final numTilesY = (game.size.y / tileSize).floor();
+    // final numTilesX = (game.size.x / tileSize).floor();
     if (backgroundLayer != null) {
       final backgroundColor =
           backgroundLayer.properties.getValue('BackgroundColor');
+      final backgroundTile = BackgroundTile(
+        color: backgroundColor ?? 'Gray',
+        position: Vector2(0, 0),
+      );
+      add(backgroundTile);
 
       /// looping to create background tile
-      for (double y = 0; y < game.size.y / numTilesY; y++) {
-        for (double x = 0; x < numTilesX; x++) {
-          final backgroungTile = BackgroundTile(
-            color: backgroundColor ?? 'Gray',
-            position: Vector2(x * tileSize, y * tileSize - tileSize),
-          );
-          add(backgroungTile);
-        }
-      }
+      // for (double y = 0; y < game.size.y / numTilesY; y++) {
+      //   for (double x = 0; x < numTilesX; x++) {
+      //     final backgroungTile = BackgroundTile(
+      //       color: backgroundColor ?? 'Gray',
+      //       position: Vector2(x * tileSize, y * tileSize - tileSize),
+      //     );
+      //     add(backgroungTile);
+      //   }
+      // }
     }
   }
 
@@ -76,6 +81,7 @@ class Level extends World with HasGameRef<PixelAdventure> {
             //   position: Vector2(spawnPoint.x, spawnPoint.y),
             // );
             player.position = Vector2(spawnPoint.x, spawnPoint.y);
+            player.scale.x = 1;
             add(player);
             break;
           case 'Fruit':
