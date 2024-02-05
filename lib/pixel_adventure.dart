@@ -31,6 +31,8 @@ class PixelAdventure extends FlameGame
     'Level-01',
   ];
   int currentLevelIndex = 0;
+  bool playSounds = true;
+  double soundVolume = 1.0;
 
   @override
   FutureOr<void> onLoad() async {
@@ -123,6 +125,8 @@ class PixelAdventure extends FlameGame
       _loadLevel();
     } else {
       /// no more levels
+      currentLevelIndex = 0;
+      _loadLevel();
     }
   }
 

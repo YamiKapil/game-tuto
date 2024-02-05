@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_game_tuto/components/checkpoint.dart';
 import 'package:flame_game_tuto/components/collision_block.dart';
 import 'package:flame_game_tuto/components/fruit.dart';
@@ -363,6 +364,12 @@ class Player extends SpriteAnimationGroupComponent
   }
 
   _playerJump(double dt) {
+    if (game.playSounds) {
+      FlameAudio.play(
+        'jump.wav',
+        volume: game.soundVolume,
+      );
+    }
     velocity.y = -_jumpForce;
     position.y += velocity.y * dt;
     hasJumped = false;
@@ -370,6 +377,13 @@ class Player extends SpriteAnimationGroupComponent
   }
 
   void _respawn() async {
+    if (game.playSounds) {
+      FlameAudio.play(
+        'hit.wav',
+        volume: game.soundVolume,
+      );
+    }
+
     /// duration is 50 times amount of frame which is 7
     // const hitDuration = Duration(milliseconds: 350);
     // const appearingDuration = Duration(milliseconds: 350);
@@ -410,27 +424,42 @@ class Player extends SpriteAnimationGroupComponent
     // });
   }
 
-  void _reachedCheckpoint() {
+  void _reachedCheckpoint() async {
     reachedCheckpoint = true;
+    if (game.playSounds) {
+      FlameAudio.play(
+        'disappear.wav',
+        volume: game.soundVolume,
+      );
+    }
     if (scale.x > 0) {
       position = position - Vector2.all(32);
     } else if (scale.x < 0) {
       position = position + Vector2(32, -32);
     }
     current = PlayerState.disappearing;
-    const reachedCheckpointDuration = Duration(milliseconds: 350);
-    Future.delayed(reachedCheckpointDuration, () {
-      reachedCheckpoint = false;
+    // const reachedCheckpointDuration = Duration(milliseconds: 350);
 
-      /// removing player from the screen..
-      /// for now just placing player way off the screen..
-      position = Vector2.all(-640);
-
-      /// moving to next level..
-      const waitToChangeDuration = Duration(seconds: 3);
-      Future.delayed(waitToChangeDuration, () {
-        game.loadNextLevel();
-      });
+    await animationTicker?.completed;
+    animationTicker?.reset();
+    reachedCheckpoint = false;
+    position = Vector2.all(-640);
+    const waitToChangeDuration = Duration(seconds: 3);
+    Future.delayed(waitToChangeDuration, () {
+      game.loadNextLevel();
     });
+    // Future.delayed(reachedCheckpointDuration, () {
+    //   reachedCheckpoint = false;
+
+    //   /// removing player from the screen..
+    //   /// for now just placing player way off the screen..
+    //   position = Vector2.all(-640);
+
+    //   /// moving to next level..
+    //   const waitToChangeDuration = Duration(seconds: 3);
+    //   Future.delayed(waitToChangeDuration, () {
+    //     game.loadNextLevel();
+    //   });
+    // });
   }
 }
