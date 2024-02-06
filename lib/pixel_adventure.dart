@@ -27,7 +27,7 @@ class PixelAdventure extends FlameGame
   late JoystickComponent joystick;
   bool showControlls = false;
   List<String> levelNames = [
-    'Level-01',
+    'Level-03',
     'Level-01',
   ];
   int currentLevelIndex = 0;
@@ -120,7 +120,7 @@ class PixelAdventure extends FlameGame
   }
 
   void loadNextLevel() {
-    if (currentLevelIndex < levelNames.length) {
+    if (currentLevelIndex < levelNames.length - 1) {
       currentLevelIndex++;
       _loadLevel();
     } else {

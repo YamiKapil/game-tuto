@@ -5,6 +5,7 @@ import 'package:flame/components.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_game_tuto/components/checkpoint.dart';
 import 'package:flame_game_tuto/components/collision_block.dart';
+import 'package:flame_game_tuto/components/enemy.dart';
 import 'package:flame_game_tuto/components/fruit.dart';
 import 'package:flame_game_tuto/components/player_hitbox.dart';
 import 'package:flame_game_tuto/components/saw.dart';
@@ -185,6 +186,9 @@ class Player extends SpriteAnimationGroupComponent
       }
       if (other is CheckPoint) {
         _reachedCheckpoint();
+      }
+      if (other is Enemy) {
+        other.collidedWithPlayer();
       }
     }
     super.onCollisionStart(intersectionPoints, other);
@@ -461,5 +465,9 @@ class Player extends SpriteAnimationGroupComponent
     //     game.loadNextLevel();
     //   });
     // });
+  }
+
+  void collidedWithEnemy() {
+    _respawn();
   }
 }

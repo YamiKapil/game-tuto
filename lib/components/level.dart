@@ -4,6 +4,7 @@ import 'package:flame/components.dart';
 import 'package:flame_game_tuto/components/background_tile.dart';
 import 'package:flame_game_tuto/components/checkpoint.dart';
 import 'package:flame_game_tuto/components/collision_block.dart';
+import 'package:flame_game_tuto/components/enemy.dart';
 import 'package:flame_game_tuto/components/fruit.dart';
 import 'package:flame_game_tuto/components/player.dart';
 import 'package:flame_game_tuto/components/saw.dart';
@@ -129,6 +130,23 @@ class Level extends World with HasGameRef<PixelAdventure> {
               ),
             );
             add(checkpoint);
+            break;
+          case 'Enemy':
+            final offNeg = spawnPoint.properties.getValue('offNeg');
+            final offPos = spawnPoint.properties.getValue('offPos');
+            final enemy = Enemy(
+              position: Vector2(
+                spawnPoint.x,
+                spawnPoint.y,
+              ),
+              size: Vector2(
+                spawnPoint.width,
+                spawnPoint.height,
+              ),
+              offNeg: offNeg,
+              offPos: offPos,
+            );
+            add(enemy);
             break;
           default:
         }
