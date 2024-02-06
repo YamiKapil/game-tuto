@@ -28,6 +28,7 @@ class Saw extends SpriteAnimationComponent with HasGameRef<PixelAdventure> {
 
   @override
   FutureOr<void> onLoad() {
+    debugMode = false;
     priority = -1;
     add(CircleHitbox());
 

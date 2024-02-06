@@ -11,6 +11,6 @@ class CollisionBlock extends PositionComponent {
           size: size,
         ) {
     // this will show all the collision platforms if true
-    // debugMode = true;
+    debugMode = false;
   }
 }

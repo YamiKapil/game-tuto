@@ -5,8 +5,8 @@ import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
 import 'package:flame_game_tuto/components/jump_button.dart';
-import 'package:flame_game_tuto/components/player.dart';
 import 'package:flame_game_tuto/components/level.dart';
+import 'package:flame_game_tuto/components/player.dart';
 import 'package:flutter/material.dart';
 
 class PixelAdventure extends FlameGame
@@ -38,6 +38,7 @@ class PixelAdventure extends FlameGame
   FutureOr<void> onLoad() async {
     /// loading images into cache
     /// donot use if loading more images
+    debugMode = false;
     await images.loadAllImages();
     // final myworld = Level(
     //   levelName: 'Level-01',
@@ -79,7 +80,7 @@ class PixelAdventure extends FlameGame
   }
 
   void addJoystick() {
-    priority = 10;
+    priority = 20;
     joystick = JoystickComponent(
       knob: SpriteComponent(
         sprite: Sprite(
@@ -120,6 +121,7 @@ class PixelAdventure extends FlameGame
   }
 
   void loadNextLevel() {
+    removeWhere((component) => component is Level);
     if (currentLevelIndex < levelNames.length - 1) {
       currentLevelIndex++;
       _loadLevel();
@@ -147,4 +149,15 @@ class PixelAdventure extends FlameGame
       );
     });
   }
+
+  // void removeAllEnemiesAndTraps() {
+  //   final enemies = children.whereType<Enemy>();
+  //   final traps = children.whereType<Saw>();
+  //   for (var enemy in enemies) {
+  //     enemy.removeFromParent();
+  //   }
+  //   for (var saw in traps) {
+  //     saw.removeFromParent();
+  //   }
+  // }
 }

@@ -29,7 +29,7 @@ class Fruit extends SpriteAnimationComponent
 
   @override
   FutureOr<void> onLoad() {
-    // debugMode = true;
+    debugMode = false;
     priority = -1;
     add(
       RectangleHitbox(

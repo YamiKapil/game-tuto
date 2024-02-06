@@ -43,7 +43,7 @@ class Enemy extends SpriteAnimationGroupComponent
 
   @override
   FutureOr<void> onLoad() {
-    debugMode = true;
+    debugMode = false;
     player = game.player;
     add(
       RectangleHitbox(

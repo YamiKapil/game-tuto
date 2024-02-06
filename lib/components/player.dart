@@ -90,11 +90,12 @@ class Player extends SpriteAnimationGroupComponent
 
   @override
   FutureOr<void> onLoad() {
+    debugMode = false;
     _loadAllAnimations();
 
     /// getting player initial position and setting it..
     startingPosition = Vector2(position.x, position.y);
-    // debugMode = true;
+    // debugMode = false;
     add(RectangleHitbox(
       position: Vector2(hitbox.offsetX, hitbox.offsetY),
       size: Vector2(hitbox.width, hitbox.height),

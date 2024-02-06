@@ -19,7 +19,7 @@ class CheckPoint extends SpriteAnimationComponent
 
   @override
   FutureOr<void> onLoad() {
-    // debugMode = true;
+    // debugMode = false;
     add(RectangleHitbox(
       // moving 18 from the left and 56 from the top.
       position: Vector2(18, 56),

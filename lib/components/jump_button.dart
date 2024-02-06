@@ -13,12 +13,13 @@ class JumpButton extends SpriteComponent
 
   @override
   FutureOr<void> onLoad() {
+    debugMode = false;
+    priority = 10;
     sprite = Sprite(game.images.fromCache('HUD/JumpButton.png'));
     position = Vector2(
       game.size.x - margin - buttonSize,
       game.size.y - margin - buttonSize,
     );
-    priority = 10;
     return super.onLoad();
   }
 
